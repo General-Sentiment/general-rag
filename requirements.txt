@@ -1,0 +1,6 @@
+pypdf>=6.0,<7
+reportlab>=4.4,<5
+Pillow>=11,<13
+fonttools>=4,<5
+mistune>=3,<4
+pyphen>=0.17,<1

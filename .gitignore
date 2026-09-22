@@ -1,0 +1,10 @@
+node_modules/
+.next/
+.venv/
+__pycache__/
+*.pyc
+.env*.local
+public/pdfjs/
+output/
+tmp/
+*.tsbuildinfo

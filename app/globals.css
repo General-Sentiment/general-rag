@@ -1,0 +1,208 @@
+@font-face {
+  font-family: "ABC Areal";
+  src: url("/fonts/ABCArealVariable.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "ABC Areal Superfamily";
+  src: url("/fonts/ABCArealSuperfamilyVariable.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Alegreya";
+  src: url("/fonts/Alegreya-VariableFont_wght.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+}
+
+:root {
+  --unit: 8px;
+  --font-size: 13px;
+  --line-height: 16px;
+  --space: 16px;
+  color-scheme: light;
+  font-family: "ABC Areal", Arial, Helvetica, sans-serif;
+  font-kerning: none;
+  font-variant-ligatures: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+* { box-sizing: border-box; }
+
+html, body { min-height: 100%; }
+
+body {
+  margin: 0;
+  background: #efefed;
+  color: #000;
+  font-size: var(--font-size);
+  line-height: var(--line-height);
+}
+
+button, input, select, textarea { font: inherit; color: inherit; }
+button, select, input { border-radius: 0; }
+
+.app-shell {
+  --print-page-width: 8.5in;
+  --print-page-height: 11in;
+  min-height: 100vh;
+}
+
+[data-page-size="a4"].app-shell {
+  --print-page-width: 210mm;
+  --print-page-height: 297mm;
+}
+
+[data-page-size="half-letter"].app-shell {
+  --print-page-width: 5.5in;
+  --print-page-height: 8.5in;
+}
+
+.print-button, .url-form button {
+  min-height: 32px;
+  padding: 7px 12px;
+  border: 1px solid #000;
+  background: #000;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: 336px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.controls {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  border-right: 1px solid #000;
+  background: #fff;
+}
+
+.sidebar-status {
+  display: flex;
+  flex: 0 0 auto;
+  justify-content: space-between;
+  gap: 8px;
+  margin: calc(-1 * var(--space)) calc(-1 * var(--space)) 8px;
+  padding: 8px var(--space);
+  border-bottom: 1px solid #000;
+  font-family: "ABC Areal Superfamily", monospace;
+  font-size: 11px;
+  font-variation-settings: "MONO" 100, "wght" 400;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.controls-scroll {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space);
+}
+
+.print-actions {
+  flex: 0 0 auto;
+  border-top: 1px solid #000;
+}
+
+.print-actions .error { padding: 8px var(--space); }
+
+.print-actions .generate-button {
+  width: 100%;
+  min-height: 48px;
+  border: 0;
+  border-bottom: 1px solid #000;
+  background: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.print-actions .print-button {
+  width: 100%;
+  min-height: 48px;
+  border: 0;
+}
+
+.controls label, .controls legend { font-weight: 700; }
+.controls fieldset { display: grid; gap: 8px; margin: 8px 0 0; padding: 0; border: 0; }
+
+.controls textarea {
+  width: 100%;
+  min-height: 300px;
+  resize: vertical;
+  padding: 10px;
+  border: 1px solid #999;
+  background: #fff;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.controls input[type="url"], .controls input[type="text"], .controls select {
+  width: 100%;
+  min-width: 0;
+  height: 36px;
+  min-height: 36px;
+  padding: 0 10px;
+  border: 1px solid #999;
+  background: #fff;
+}
+
+.url-form { display: grid; gap: 8px; margin-bottom: 8px; }
+.metadata-fields { display: grid; gap: 8px; margin-bottom: 8px; }
+.inline-field { display: grid; grid-template-columns: minmax(0, 1fr) auto; }
+.inline-field input { border-right: 0 !important; }
+.error { margin: 0; color: #b00020; }
+
+.segmented { display: grid; grid-template-columns: 1fr 1fr; }
+.segmented button {
+  height: 36px;
+  border: 1px solid #999;
+  background: #fff;
+  cursor: pointer;
+}
+.segmented button + button { border-left: 0; }
+.segmented button[aria-pressed="true"] { border-color: #000; background: #000; color: #fff; }
+
+.check-row { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+.check-row input { width: 16px; height: 16px; margin: 0; accent-color: #000; }
+.note, .range-field span { margin: -2px 0 4px 24px; color: #666; }
+
+.range-field { display: grid; gap: 4px; margin-left: 24px; }
+.range-field label { display: flex; justify-content: space-between; }
+.range-field input { width: 100%; accent-color: #000; }
+.range-field span { margin: 0; }
+
+.preview-region { min-width: 0; height: 100dvh; overflow: auto; background: #333; }
+
+.pdf-preview { display: grid; align-content: start; gap: 16px; width: 100%; min-height: 100%; background: #333; }
+.pdf-page { position: relative; width: 100%; aspect-ratio: 8.5 / 11; margin: 0 auto; background: white; overflow: hidden; }
+.pdf-page canvas { display: block; width: 100%; height: 100%; }
+.pdf-page .textLayer { transform-origin: top left; }
+.preview-empty { padding: 48px; text-align: center; color: #ddd; }
+a.print-button { display: flex; align-items: center; justify-content: center; text-align: center; text-decoration: none; }
+button:disabled { opacity: 0.5; cursor: wait; }
+@media (max-width: 760px) {
+  .workspace { grid-template-columns: 1fr; }
+  .controls { position: static; height: auto; overflow: visible; border-right: 0; border-bottom: 1px solid #000; }
+  .controls-scroll { overflow: visible; }
+  .controls textarea { min-height: 220px; }
+  .preview-region { height: auto; min-height: 100dvh; overflow: visible; }
+}
