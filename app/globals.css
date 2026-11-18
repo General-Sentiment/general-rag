@@ -65,7 +65,7 @@ button, select, input { border-radius: 0; }
   --print-page-height: 8.5in;
 }
 
-.print-button, .url-form button {
+.print-button, .desktop-download-button, .url-form button {
   min-height: 32px;
   padding: 7px 12px;
   border: 1px solid #000;
@@ -132,6 +132,20 @@ button, select, input { border-radius: 0; }
   background: #fff;
   font-weight: 700;
   cursor: pointer;
+}
+
+.print-actions .desktop-download-button {
+  display: flex;
+  width: 100%;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-bottom: 1px solid #000;
+  background: #fff;
+  color: #000;
+  text-align: center;
+  text-decoration: none;
 }
 
 .print-actions .print-button {

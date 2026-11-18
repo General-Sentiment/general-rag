@@ -74,6 +74,7 @@ pub fn run() {
                     .env("HOSTNAME", "127.0.0.1")
                     .env("PORT", port.to_string())
                     .env("JOURNAL_RENDERER", renderer)
+                    .env("GENERAL_RAG_DESKTOP", "1")
                     .stdin(Stdio::null())
                     .stdout(Stdio::null())
                     .stderr(Stdio::null())

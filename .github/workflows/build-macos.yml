@@ -1,0 +1,79 @@
+name: Build macOS app
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: macos-main-release
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build Apple silicon DMG
+    runs-on: macos-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-desktop.txt
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install JavaScript dependencies
+        run: npm ci
+
+      - name: Install desktop renderer dependencies
+        run: |
+          python -m venv .venv
+          .venv/bin/pip install -r requirements-desktop.txt
+
+      - name: Build disk image
+        run: npm run tauri -- build --bundles dmg
+
+      - name: Prepare stable release asset
+        shell: bash
+        run: |
+          mkdir -p release
+          images=(src-tauri/target/release/bundle/dmg/*.dmg)
+          test "${#images[@]}" -eq 1
+          cp "${images[0]}" release/General-Rag-macOS.dmg
+
+      - name: Publish latest main build
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git tag --force main-latest "$GITHUB_SHA"
+          git push --force origin refs/tags/main-latest
+          if gh release view main-latest >/dev/null 2>&1; then
+            gh release upload main-latest release/General-Rag-macOS.dmg --clobber
+            gh release edit main-latest \
+              --title "Latest main build" \
+              --notes "Automatically built from main at ${GITHUB_SHA}." \
+              --prerelease
+          else
+            gh release create main-latest release/General-Rag-macOS.dmg \
+              --title "Latest main build" \
+              --notes "Automatically built from main at ${GITHUB_SHA}." \
+              --prerelease \
+              --target "$GITHUB_SHA"
+          fi

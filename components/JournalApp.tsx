@@ -10,8 +10,9 @@ type Typeface = "sans" | "serif";
 const PAPER_LABELS: Record<PageSize, string> = {
   letter: "Letter — 8.5 × 11 in", a4: "A4 — 210 × 297 mm", "half-letter": "Half Letter — 5.5 × 8.5 in",
 };
+const DESKTOP_DOWNLOAD_URL = "https://github.com/General-Sentiment/general-rag/releases/download/main-latest/General-Rag-macOS.dmg";
 
-export function JournalApp() {
+export function JournalApp({ showDesktopDownload = false }: { showDesktopDownload?: boolean }) {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [markdown, setMarkdown] = useState("");
@@ -147,6 +148,15 @@ export function JournalApp() {
             )}
           </div>
           <div className="print-actions">
+            {showDesktopDownload && (
+              <a
+                className="desktop-download-button"
+                href={DESKTOP_DOWNLOAD_URL}
+                aria-label="Download the latest General Rag app for Apple silicon macOS"
+              >
+                Download Mac App
+              </a>
+            )}
             {saveError && <p className="error" role="alert">{saveError}</p>}
             <button className="generate-button" type="button" onClick={() => void generatePreview()} disabled={saving || loading || !markdown.trim()}>
               {saving ? "Generating PDF…" : "Generate PDF"}

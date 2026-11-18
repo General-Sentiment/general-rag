@@ -44,6 +44,8 @@ npm run desktop:build
 
 The app bundle is written to `src-tauri/target/release/bundle/macos/General Rag.app`. The current desktop packaging target is Apple silicon macOS 12 or newer.
 
+Every push to `main` also builds an Apple silicon disk image in GitHub Actions and publishes it to the stable `main-latest` prerelease. The hosted app's **Download Mac App** button points directly to that release asset, so the URL stays the same as new builds replace it.
+
 Markdown support includes headings, emphasis, nested lists, quotes, code, tables, figures with captions, and endnotes. Raw HTML blocks are rejected. Long captions can continue across columns or pages while the image stays with at least the first two caption lines; wide tables may need a larger paper size. Alegreya italic is an embedded oblique generated from the bundled upright font. Complex-script shaping and mathematical typesetting are not implemented.
 
 ## Use in this chat
