@@ -1,4 +1,4 @@
-# General Rag
+# Quarter
 
 Turns a PDF in normal reading order into a two-up booklet PDF. Print it double-sided, fold each sheet in half hamburger-style, nest the sheets, and staple through the fold.
 
@@ -23,13 +23,13 @@ The server needs a Node environment with Python installed (not an Edge runtime o
 
 The hosted app runs as a Next.js standalone server with its Python renderer inside a Cloudflare Container. `wrangler.jsonc` routes the public Worker to one scale-to-zero container, and `Dockerfile` produces the same `linux/amd64` image locally and in Cloudflare Workers Builds.
 
-Cloudflare Containers require the Workers Paid plan. After enabling it, connect this GitHub repository to a Worker named `general-rag`, use `main` as the production branch, leave the optional build command empty, and use `npx wrangler deploy` as the deploy command. Workers Builds will then rebuild and deploy the app after every push to `main`. Preview builds are intentionally disabled because Container images are updated by `wrangler deploy`, not `wrangler versions upload`.
+Cloudflare Containers require the Workers Paid plan. After enabling it, connect this GitHub repository to a Worker named `quarter`, use `main` as the production branch, leave the optional build command empty, and use `npx wrangler deploy` as the deploy command. Workers Builds will then rebuild and deploy the app after every push to `main`. Preview builds are intentionally disabled because Container images are updated by `wrangler deploy`, not `wrangler versions upload`. The Worker is the origin for the `quarter.page` custom domain.
 
 To validate the image locally:
 
 ```sh
-docker build --platform linux/amd64 --tag general-rag:cloudflare .
-docker run --rm --publish 3000:3000 general-rag:cloudflare
+docker build --platform linux/amd64 --tag quarter:cloudflare .
+docker run --rm --publish 3000:3000 quarter:cloudflare
 ```
 
 ## Native macOS app
@@ -42,7 +42,7 @@ npm install
 npm run desktop:build
 ```
 
-The app bundle is written to `src-tauri/target/release/bundle/macos/General Rag.app`. The current desktop packaging target is Apple silicon macOS 12 or newer.
+The app bundle is written to `src-tauri/target/release/bundle/macos/Quarter.app`. The current desktop packaging target is Apple silicon macOS 12 or newer.
 
 Every push to `main` also builds an Apple silicon disk image in GitHub Actions and publishes it to the stable `main-latest` prerelease. The hosted app's **Download Mac App** button points directly to that release asset, so the URL stays the same as new builds replace it.
 

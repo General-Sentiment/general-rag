@@ -1,5 +1,5 @@
 [package]
-name = "general-rag"
+name = "quarter"
 version = "0.1.0"
 description = "Turn Markdown and articles into printable reading copies."
 authors = ["General Sentiment"]
@@ -7,7 +7,7 @@ edition = "2024"
 rust-version = "1.90"
 
 [lib]
-name = "general_rag_lib"
+name = "quarter_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]

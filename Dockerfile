@@ -17,15 +17,15 @@ ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
     HOSTNAME=0.0.0.0 \
     PORT=3000 \
-    JOURNAL_PYTHON=/opt/general-rag-venv/bin/python
+    JOURNAL_PYTHON=/opt/quarter-venv/bin/python
 
 RUN apt-get update \
     && apt-get install --no-install-recommends --yes python3 python3-venv \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt ./
-RUN python3 -m venv /opt/general-rag-venv \
-    && /opt/general-rag-venv/bin/pip install --no-cache-dir --requirement requirements.txt
+RUN python3 -m venv /opt/quarter-venv \
+    && /opt/quarter-venv/bin/pip install --no-cache-dir --requirement requirements.txt
 
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static

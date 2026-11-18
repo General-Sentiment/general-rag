@@ -10,7 +10,7 @@ type Typeface = "sans" | "serif";
 const PAPER_LABELS: Record<PageSize, string> = {
   letter: "Letter — 8.5 × 11 in", a4: "A4 — 210 × 297 mm", "half-letter": "Half Letter — 5.5 × 8.5 in",
 };
-const DESKTOP_DOWNLOAD_URL = "https://github.com/General-Sentiment/general-rag/releases/download/main-latest/General-Rag-macOS.dmg";
+const DESKTOP_DOWNLOAD_URL = "https://github.com/General-Sentiment/quarter/releases/download/main-latest/Quarter-macOS.dmg";
 
 export function JournalApp({ showDesktopDownload = false }: { showDesktopDownload?: boolean }) {
   const [title, setTitle] = useState("");
@@ -152,7 +152,7 @@ export function JournalApp({ showDesktopDownload = false }: { showDesktopDownloa
               <a
                 className="desktop-download-button"
                 href={DESKTOP_DOWNLOAD_URL}
-                aria-label="Download the latest General Rag app for Apple silicon macOS"
+                aria-label="Download the latest Quarter app for Apple silicon macOS"
               >
                 Download Mac App
               </a>

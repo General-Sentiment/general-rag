@@ -1,8 +1,8 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "General Rag",
+  "productName": "Quarter",
   "version": "0.1.0",
-  "identifier": "org.generalsentiment.general-rag",
+  "identifier": "org.generalsentiment.quarter",
   "build": {
     "frontendDist": "../desktop-static",
     "devUrl": "http://127.0.0.1:3000",
@@ -13,7 +13,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "General Rag",
+        "title": "Quarter",
         "width": 1440,
         "height": 960,
         "minWidth": 980,

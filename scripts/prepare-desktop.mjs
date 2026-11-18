@@ -39,7 +39,7 @@ execFileSync(python, [
   "--noconfirm",
   "--clean",
   "--onefile",
-  "--name", "general-rag-renderer",
+  "--name", "quarter-renderer",
   "--distpath", bin,
   "--workpath", join(buildRoot, "pyinstaller"),
   "--specpath", buildRoot,
@@ -49,5 +49,5 @@ execFileSync(python, [
   join(root, "markdown_columns.py"),
 ], { cwd: root, stdio: "inherit" });
 
-chmodSync(join(bin, "general-rag-renderer"), 0o755);
+chmodSync(join(bin, "quarter-renderer"), 0o755);
 console.log(`Desktop resources prepared in ${resources}`);

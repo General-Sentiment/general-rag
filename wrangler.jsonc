@@ -1,16 +1,23 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "general-rag",
+  "name": "quarter",
   "main": "cloudflare/index.ts",
   "compatibility_date": "2026-11-18",
   "upload_source_maps": true,
   "workers_dev": true,
+  "preview_urls": false,
+  "routes": [
+    {
+      "pattern": "quarter.page",
+      "custom_domain": true
+    }
+  ],
   "observability": {
     "enabled": true
   },
   "containers": [
     {
-      "class_name": "GeneralRagContainer",
+      "class_name": "QuarterContainer",
       "scheduling_policy": "durable_object",
       "images": {
         "base": {
@@ -22,13 +29,13 @@
   "durable_objects": {
     "bindings": [
       {
-        "name": "GENERAL_RAG_CONTAINER",
-        "class_name": "GeneralRagContainer"
+        "name": "QUARTER_CONTAINER",
+        "class_name": "QuarterContainer"
       }
     ]
   },
   "exports": {
-    "GeneralRagContainer": {
+    "QuarterContainer": {
       "type": "durable-object",
       "storage": "sqlite"
     }

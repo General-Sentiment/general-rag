@@ -4,10 +4,10 @@ const PORT = 3000;
 const INACTIVITY_TIMEOUT_MS = 10 * 60 * 1000;
 
 interface Env {
-  GENERAL_RAG_CONTAINER: DurableObjectNamespace<GeneralRagContainer>;
+  QUARTER_CONTAINER: DurableObjectNamespace<QuarterContainer>;
 }
 
-export class GeneralRagContainer extends DurableObject<Env> {
+export class QuarterContainer extends DurableObject<Env> {
   private starting: Promise<void> | undefined;
   private monitoring: Promise<void> | undefined;
 
@@ -61,15 +61,15 @@ export class GeneralRagContainer extends DurableObject<Env> {
       }
       await scheduler.wait(200);
     }
-    throw new Error(`General Rag did not become ready on port ${PORT}`);
+    throw new Error(`Quarter did not become ready on port ${PORT}`);
   }
 
   private observeExit(): void {
     if (this.monitoring) return;
     this.monitoring = this.ctx
       .container!.monitor()
-      .then(() => console.log("General Rag container exited successfully"))
-      .catch((error: unknown) => console.error("General Rag container failed", error))
+      .then(() => console.log("Quarter container exited successfully"))
+      .catch((error: unknown) => console.error("Quarter container failed", error))
       .finally(() => {
         this.monitoring = undefined;
       });
@@ -79,7 +79,7 @@ export class GeneralRagContainer extends DurableObject<Env> {
 
 const worker = {
   async fetch(request: Request, env: Env): Promise<Response> {
-    return env.GENERAL_RAG_CONTAINER.getByName("production").fetch(request);
+    return env.QUARTER_CONTAINER.getByName("production").fetch(request);
   },
 };
 

@@ -30,7 +30,7 @@ fn wait_for_server(port: u16) -> bool {
 fn navigate_when_ready<R: Runtime>(handle: tauri::AppHandle<R>, port: u16) {
     thread::spawn(move || {
         if !wait_for_server(port) {
-            eprintln!("General Rag local server did not start within 30 seconds.");
+            eprintln!("Quarter local server did not start within 30 seconds.");
             return;
         }
         let navigation_handle = handle.clone();
@@ -42,7 +42,7 @@ fn navigate_when_ready<R: Runtime>(handle: tauri::AppHandle<R>, port: u16) {
             match target.parse() {
                 Ok(url) => {
                     if let Err(error) = window.navigate(url) {
-                        eprintln!("Could not open General Rag: {error}");
+                        eprintln!("Could not open Quarter: {error}");
                     }
                 }
                 Err(error) => eprintln!("Invalid local server URL: {error}"),
@@ -65,7 +65,7 @@ pub fn run() {
                 let resources = app.path().resource_dir()?;
                 let server_dir = resources.join("server");
                 let node = resources.join("bin").join("node");
-                let renderer = resources.join("bin").join("general-rag-renderer");
+                let renderer = resources.join("bin").join("quarter-renderer");
                 let port = available_port()?;
 
                 let child = Command::new(node)
@@ -74,7 +74,7 @@ pub fn run() {
                     .env("HOSTNAME", "127.0.0.1")
                     .env("PORT", port.to_string())
                     .env("JOURNAL_RENDERER", renderer)
-                    .env("GENERAL_RAG_DESKTOP", "1")
+                    .env("QUARTER_DESKTOP", "1")
                     .stdin(Stdio::null())
                     .stdout(Stdio::null())
                     .stderr(Stdio::null())
@@ -98,5 +98,5 @@ pub fn run() {
             }
         })
         .run(tauri::generate_context!())
-        .expect("error while running General Rag");
+        .expect("error while running Quarter");
 }

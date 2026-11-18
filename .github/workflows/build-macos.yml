@@ -1,4 +1,4 @@
-name: Build macOS app
+name: Build Quarter macOS app
 
 on:
   push:
@@ -56,7 +56,7 @@ jobs:
           mkdir -p release
           images=(src-tauri/target/release/bundle/dmg/*.dmg)
           test "${#images[@]}" -eq 1
-          cp "${images[0]}" release/General-Rag-macOS.dmg
+          cp "${images[0]}" release/Quarter-macOS.dmg
 
       - name: Publish latest main build
         env:
@@ -65,13 +65,13 @@ jobs:
           git tag --force main-latest "$GITHUB_SHA"
           git push --force origin refs/tags/main-latest
           if gh release view main-latest >/dev/null 2>&1; then
-            gh release upload main-latest release/General-Rag-macOS.dmg --clobber
+            gh release upload main-latest release/Quarter-macOS.dmg --clobber
             gh release edit main-latest \
               --title "Latest main build" \
               --notes "Automatically built from main at ${GITHUB_SHA}." \
               --prerelease
           else
-            gh release create main-latest release/General-Rag-macOS.dmg \
+            gh release create main-latest release/Quarter-macOS.dmg \
               --title "Latest main build" \
               --notes "Automatically built from main at ${GITHUB_SHA}." \
               --prerelease \
