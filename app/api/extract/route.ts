@@ -4,6 +4,8 @@ import { NextResponse } from "next/server";
 import { isIP } from "node:net";
 import { lookup } from "node:dns/promises";
 
+import { normalizeArticleUrl } from "@/lib/article-url";
+
 export const runtime = "nodejs";
 
 function isPrivateHost(hostname: string) {
@@ -51,15 +53,49 @@ async function fetchArticle(initialUrl: URL, signal: AbortSignal) {
   throw new Error("The page redirected too many times.");
 }
 
+async function extractMarkdown(document: Document, url: URL) {
+  const result = await Defuddle(document, url.href, {
+    markdown: true,
+    separateMarkdown: true,
+  });
+  let markdown = result.contentMarkdown ?? result.content ?? "";
+
+  // e-flux keeps the article body and its notes in separate siblings. Generic
+  // readability scoring currently chooses the much shorter notes block. Give
+  // Defuddle an isolated article so it can still clean and convert the markup
+  // without having to guess which sibling contains the primary content.
+  if (url.hostname === "e-flux.com" || url.hostname.endsWith(".e-flux.com")) {
+    const body = document.querySelector(".article__body");
+    const notes = document.querySelector(".article__footnotes");
+    if (body && (body.textContent?.trim().length ?? 0) > 500) {
+      const isolatedHtml = `<!doctype html><html><head><title>Article</title></head><body><main><article>${body.innerHTML}${notes?.outerHTML ?? ""}</article></main></body></html>`;
+      const { document: isolatedDocument } = parseHTML(isolatedHtml);
+      const isolated = await Defuddle(isolatedDocument, url.href, {
+        markdown: true,
+        separateMarkdown: true,
+      });
+      const isolatedMarkdown = isolated.contentMarkdown ?? isolated.content ?? "";
+      if (isolatedMarkdown.length > markdown.length) markdown = isolatedMarkdown;
+    }
+  }
+
+  return { result, markdown };
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json() as { url?: string };
-    const url = new URL(body.url ?? "");
+    const url = new URL(normalizeArticleUrl(body.url ?? ""));
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 12_000);
-    const { response, url: finalUrl } = await fetchArticle(url, controller.signal);
-    clearTimeout(timeout);
+    let response: Response;
+    let finalUrl: URL;
+    try {
+      ({ response, url: finalUrl } = await fetchArticle(url, controller.signal));
+    } finally {
+      clearTimeout(timeout);
+    }
 
     if (!response.ok) throw new Error(`The page returned ${response.status}.`);
     const contentType = response.headers.get("content-type") ?? "";
@@ -72,16 +108,13 @@ export async function POST(request: Request) {
     if (html.length > 5_000_000) throw new Error("The page is too large to import.");
 
     const { document } = parseHTML(html);
-    const result = await Defuddle(document, finalUrl.href, {
-      markdown: true,
-      separateMarkdown: true,
-    });
+    const { result, markdown } = await extractMarkdown(document, finalUrl);
 
     return NextResponse.json({
       title: result.title ?? "Untitled",
       author: result.author ?? "",
       published: result.published ?? "",
-      markdown: result.contentMarkdown ?? result.content ?? "",
+      markdown,
       source: finalUrl.href,
     });
   } catch (error) {

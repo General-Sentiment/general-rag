@@ -1,4 +1,4 @@
-# PDF Zine Maker
+# General Rag
 
 Turns a PDF in normal reading order into a two-up booklet PDF. Print it double-sided, fold each sheet in half hamburger-style, nest the sheets, and staple through the fold.
 
@@ -18,6 +18,18 @@ Paste Markdown or import a public article URL, choose settings, and click **Gene
 Supported controls: Letter, A4, and Half Letter; Areal sans and Alegreya serif; opening text in the right column; double-sided printing guidance; grayscale figures and brightness. Figures are loaded from public HTTP(S) URLs into memory, never saved into the codebase. Broken or unsupported figures produce an error instead of silently disappearing. The web renderer rejects local/private image URLs. The CLI also supports local images relative to the Markdown file.
 
 The server needs a Node environment with Python installed (not an Edge runtime or static hosting). It uses `.venv/bin/python` by default; set `JOURNAL_PYTHON` to select another interpreter. Include `markdown_columns.py`, `assets/fonts/`, `public/fonts/`, and `vendor/pyphen/` in deployments, and install the Python requirements. `npm install` copies the matching PDF.js worker into `public/pdfjs/`.
+
+## Native macOS app
+
+The Tauri build bundles the Next.js server, an Apple silicon Node runtime, and a standalone PDF renderer. The installed app does not require Node, Python, or this source checkout.
+
+```sh
+.venv/bin/pip install -r requirements-desktop.txt
+npm install
+npm run desktop:build
+```
+
+The app bundle is written to `src-tauri/target/release/bundle/macos/General Rag.app`. The current desktop packaging target is Apple silicon macOS 12 or newer.
 
 Markdown support includes headings, emphasis, nested lists, quotes, code, tables, figures with captions, and endnotes. Raw HTML blocks are rejected. Long captions can continue across columns or pages while the image stays with at least the first two caption lines; wide tables may need a larger paper size. Alegreya italic is an embedded oblique generated from the bundled upright font. Complex-script shaping and mathematical typesetting are not implemented.
 

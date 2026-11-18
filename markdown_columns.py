@@ -337,17 +337,26 @@ def inline(nodes):
     result = []
     for node in nodes:
         kind = node['type']; children = node.get('children', [])
-        value = inline(children) if children else html.escape(node.get('raw', ''))
+        raw = node.get('raw', '')
+        if kind == 'text':
+            # Article extractors commonly leave straight typewriter quotes in
+            # prose. Normalize those without touching code or equations, where
+            # the literal characters are significant.
+            raw = re.sub(r"(?<=\w)'(?=\w)", '’', raw)
+            raw = re.sub(r"(?<=\w)'(?=\s|[.,;:!?)]|$)", '’', raw)
+            raw = re.sub(r"(^|[\s([{—–-])'(?=\S)", r'\1‘', raw)
+            raw = raw.replace("'", '’')
+            raw = re.sub(r'(^|[\s([{—–-])"(?=\S)', r'\1“', raw)
+            raw = raw.replace('"', '”')
+        value = inline(children) if children else html.escape(raw)
         if kind == 'strong': value = '<b>' + value + '</b>'
         elif kind == 'emphasis': value = '<i>' + value + '</i>'
         elif kind == 'strikethrough': value = '<strike>' + value + '</strike>'
         elif kind == 'codespan': value = '<font name="Courier">' + value + '</font>'
         elif kind == 'footnote_ref':
-            # ReportLab's default superscript rises by half the body font size,
-            # which puts note markers noticeably above the cap height. Keep the
-            # marker compact, but lower it so it remains visually attached to
-            # the word it annotates.
-            value = '<super size="7.5" rise="2.5">' + str(node['attrs']['index']) + '</super>'
+            # Use a compact, explicit superscript. The custom rise keeps the
+            # marker above the x-height without floating away from its word.
+            value = '<super size="7.5" rise="3">' + str(node['attrs']['index']) + '</super>'
         elif kind == 'linebreak': value = '<br/>'
         elif kind == 'softbreak': value = ' '
         elif kind == 'inline_html':
@@ -424,9 +433,45 @@ def render_article(article: Article, output: Path, image_map=None, options: Rend
         # A figcaption is the one supported HTML block. Strip nested markup and
         # escape its text before passing it to ReportLab.
         return html.escape(html.unescape(re.sub(r'<[^>]+>','',match.group(1))).strip())
+    def raw_text(node):
+        parts=[]
+        for child in node.get('children',[]):
+            if child['type'] in ('softbreak','linebreak'):
+                parts.append('\n')
+            elif child.get('children'):
+                parts.append(raw_text(child))
+            else:
+                parts.append(child.get('raw',''))
+        return ''.join(parts)
+    def is_caption(content):
+        plain=html.unescape(re.sub(r'<[^>]+>','',content)).strip()
+        return bool(re.match(
+            r'^(?:Figure|Fig\.|Caption:|Photo(?:graph)?(?:\s+by)?\b|Image\b|Illustration\b|'
+            r'Screenshot\b|Courtesy\b|Source\b|Credit\b|©\b|Inka Essenhigh,|Moonlight,)',
+            plain,re.I,
+        ))
+    def merge_continuation_paragraphs(items):
+        merged=[]
+        for node in items:
+            if merged and node['type']=='paragraph' and merged[-1]['type']=='paragraph':
+                previous=raw_text(merged[-1]).strip()
+                current=raw_text(node).lstrip()
+                # A lowercase continuation after an unterminated fragment is
+                # almost always an extractor-inserted blank line, not a new
+                # paragraph. Keep the rule narrow so intentional breaks remain.
+                if (previous and current and not re.search(r'[.!?…:;\]\)}”’]$',previous)
+                        and re.match(r'[a-z]',current)):
+                    merged[-1]={**merged[-1], 'children':[
+                        *merged[-1].get('children',[]),
+                        {'type':'text','raw':' '},
+                        *node.get('children',[]),
+                    ]}
+                    continue
+            merged.append(node)
+        return merged
     def flow(nodes, style='body', depth=0):
         nonlocal image_count
-        nodes = [node for node in nodes if node["type"] != "blank_line"]
+        nodes = merge_continuation_paragraphs([node for node in nodes if node["type"] != "blank_line"])
         result=[]; i=0
         while i < len(nodes):
             node=nodes[i]; kind=node['type']; children=node.get('children',[])
@@ -437,7 +482,7 @@ def render_article(article: Article, output: Path, image_map=None, options: Rend
                 if re.fullmatch(r'(?:figure|image|photo|illustration|screenshot)(?:\s+\d+)?',re.sub(r'<[^>]+>','',caption).strip(),re.I): caption=''
                 if i+1<len(nodes) and nodes[i+1]['type']=='paragraph':
                     candidate=inline(nodes[i+1].get('children',[]))
-                    if re.match(r'^(?:<b>)?(?:Figure\s+\d+|Caption:|Photo\b|Image\b|Courtesy\b|Inka Essenhigh,|Moonlight,)',candidate,re.I):
+                    if is_caption(candidate):
                         caption=re.sub(r'^Caption:\s*','',candidate,flags=re.I);i+=1
                 if i+1<len(nodes):
                     explicit_caption=figcaption_node(nodes[i+1])
@@ -477,6 +522,12 @@ def render_article(article: Article, output: Path, image_map=None, options: Rend
                     else:
                         result.append(heading)
             elif kind in ('paragraph','block_text'):
+                raw=raw_text(node).strip()
+                if raw.startswith('$$') and raw.endswith('$$') and len(raw)>4:
+                    content=html.escape(raw).replace('\n','<br/>').replace('  ','&#160;&#160;')
+                    result.append(Paragraph(content,styles['code']))
+                    i+=1
+                    continue
                 content=inline(children)
                 mapping=next((path for prefix,path in (image_map or {}).items() if re.sub('<[^>]+>','',content).startswith(prefix)),None)
                 if mapping: result.append(GridFigure(image_reader(str(mapping),options),content,styles['caption'],frame_height))

@@ -1,0 +1,18 @@
+[package]
+name = "general-rag"
+version = "0.1.0"
+description = "Turn Markdown and articles into printable reading copies."
+authors = ["General Sentiment"]
+edition = "2024"
+rust-version = "1.90"
+
+[lib]
+name = "general_rag_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.7.4", features = [] }
+
+[dependencies]
+tauri = { version = "2.12.5", features = [] }
+url = "2"

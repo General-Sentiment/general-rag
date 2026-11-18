@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useRef, useState } from "react";
 
+import { normalizeArticleUrl } from "@/lib/article-url";
 import { PdfPreview } from "./PdfPreview";
 
 type PageSize = "letter" | "a4" | "half-letter";
@@ -63,7 +64,9 @@ export function JournalApp() {
   async function importUrl(event: FormEvent) {
     event.preventDefault(); setLoading(true); setError("");
     try {
-      const response = await fetch("/api/extract", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ url }) });
+      const normalizedUrl = normalizeArticleUrl(url);
+      setUrl(normalizedUrl);
+      const response = await fetch("/api/extract", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ url: normalizedUrl }) });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Could not import that page.");
       const document = { title: result.title || "", author: result.author || "", markdown: result.markdown };

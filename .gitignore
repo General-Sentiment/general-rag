@@ -8,3 +8,9 @@ public/pdfjs/
 output/
 tmp/
 *.tsbuildinfo
+
+# Native desktop build output
+/.desktop-build/
+/src-tauri/resources/
+/src-tauri/target/
+/src-tauri/gen/schemas/

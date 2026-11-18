@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["127.0.0.1"],
-  serverExternalPackages: ["defuddle", "linkedom"],
+  output: "standalone",
 };
 
 export default nextConfig;

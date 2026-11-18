@@ -7,5 +7,7 @@ export default defineConfig([
   ...nextTypescript,
   globalIgnores([
     "public/pdfjs/**",
-    ".venv/**",".next/**", "output/**", "tmp/**", "vendor/**"]),
+    ".venv/**", ".next/**", ".desktop-build/**", "output/**", "tmp/**", "vendor/**",
+    "src-tauri/gen/**", "src-tauri/resources/**", "src-tauri/target/**",
+  ]),
 ]);

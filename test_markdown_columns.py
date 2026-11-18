@@ -177,7 +177,7 @@ class RenderArticleTests(unittest.TestCase):
         self.assertEqual(len(positions), 1)
         self.assertLess(positions[0], 300, 'the heading should use the remaining room in the left column')
 
-    def test_footnote_marker_uses_a_lower_explicit_rise(self):
+    def test_footnote_marker_uses_a_compact_superscript(self):
         from reportlab.lib.styles import ParagraphStyle
         from markdown_columns import Paragraph, inline, register_fonts
         regular, _, _ = register_fonts('sans')
@@ -185,7 +185,54 @@ class RenderArticleTests(unittest.TestCase):
         paragraph = Paragraph('Anchor' + marker + ' text', ParagraphStyle('note-marker', fontName=regular, fontSize=10))
         footnote_frag = next(fragment for fragment in paragraph.frags if fragment.text == '12')
         self.assertEqual(footnote_frag.fontSize, 7.5)
-        self.assertEqual(footnote_frag.rise, 2.5)
+        self.assertEqual(footnote_frag.rise, 3)
+
+    def test_prose_quotes_are_typographic_but_code_quotes_are_literal(self):
+        source = '# Test\n\nHe said, "hello" to the species\' keeper\'s friend.\n\n`print("literal")`'
+        text = '\n'.join(page.extract_text() for page in self.render(source, duplex=False).pages)
+        self.assertIn('“hello”', text)
+        self.assertIn('species’ keeper’s', text)
+        self.assertIn('print("literal")', text)
+
+    def test_display_math_uses_monospace_style(self):
+        source = '# Test\n\n$$ D_{KL}(P_{post} || P_{prior}) = \\ln\n\\frac{a}{b} $$'
+        reader = self.render(source, duplex=False)
+        math_fonts = []
+
+        def visitor(text, cm, tm, font, size):
+            if 'D_' in text or '\\frac' in text:
+                math_fonts.append((font.get('/BaseFont'), size))
+
+        reader.pages[0].extract_text(visitor_text=visitor)
+        self.assertTrue(math_fonts)
+        self.assertTrue(all('Courier' in str(font) and size == 8 for font, size in math_fonts))
+
+    def test_lowercase_mid_sentence_paragraph_fragment_is_rejoined(self):
+        reader = self.render('# Test\n\nWe used tools to suggest\n\nwording ideas for the final draft.', duplex=False)
+        text = reader.pages[0].extract_text()
+        self.assertIn('We used tools to suggest wording ideas for the final draft.', text.replace('\n', ' '))
+
+    def test_moved_figure_keeps_its_caption_on_the_image_page(self):
+        import tempfile
+        from pathlib import Path
+        from PIL import Image
+        from pypdf import PdfReader
+        from markdown_columns import render_article, RenderOptions
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            Image.new('RGB', (500, 350), 'red').save(root / 'figure.png')
+            source = (
+                '# Figures\n\n' + ('Filler text occupies the earlier columns. ' * 320)
+                + '\n\n![figure](figure.png)\n\nFigure 7. Caption travels with the moved figure.'
+            )
+            output = root / 'figure.pdf'
+            render_article(parse_article(source), output, options=RenderOptions(base_dir=root, start_on_right=False, duplex=False))
+            reader = PdfReader(output)
+            image_pages = [index for index, page in enumerate(reader.pages) if page.images]
+            caption_pages = [index for index, page in enumerate(reader.pages) if 'Caption travels with' in page.extract_text()]
+            self.assertEqual(len(image_pages), 1)
+            self.assertEqual(caption_pages, image_pages)
+            self.assertGreater(image_pages[0], 0)
 
     def test_notes_use_compact_style_and_heading_stays_with_first_note(self):
         source = (

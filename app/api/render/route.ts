@@ -19,17 +19,28 @@ export async function POST(request: Request) {
     if (!["letter", "a4", "half-letter"].includes(pageSize) || !["sans", "serif"].includes(typeface)) throw new Error("Choose a supported paper size and typeface.");
     if ([startOnRight, duplex, grayscale].some(value => typeof value !== "boolean") || typeof midpoint !== "number" || !Number.isFinite(midpoint) || midpoint < 0.85 || midpoint > 1.35) throw new Error("Invalid document settings.");
     const root = process.cwd();
+    const renderer = process.env.JOURNAL_RENDERER;
     const python = process.env.JOURNAL_PYTHON || ".venv/bin/python";
     directory = await mkdtemp(path.join(tmpdir(), "journal-render-"));
     const input = path.join(directory, "article.md");
     const output = path.join(directory, "article.pdf");
     await writeFile(input, data.markdown, "utf8");
-    const { stdout } = await execute(python, [
-      path.join(root, "markdown_columns.py"), input, output, "--web",
+    const renderArguments = [
+      input, output, "--web",
       `--title=${title}`, `--author=${author}`, `--page-size=${pageSize}`, `--typeface=${typeface}`, `--midpoint=${midpoint}`,
       startOnRight ? "--start-on-right" : "--no-start-on-right",
       duplex ? "--duplex" : "--no-duplex", grayscale ? "--grayscale" : "--no-grayscale",
-    ], { cwd: root, timeout: 120_000, maxBuffer: 1_000_000, signal: request.signal });
+    ];
+    const command = renderer || python;
+    const commandArguments = renderer
+      ? renderArguments
+      : [path.join(root, "markdown_columns.py"), ...renderArguments];
+    const { stdout } = await execute(command, commandArguments, {
+      cwd: root,
+      timeout: 120_000,
+      maxBuffer: 1_000_000,
+      signal: request.signal,
+    });
     const result = JSON.parse(stdout.trim());
     const pdf = await readFile(output);
     return new Response(new Uint8Array(pdf), { headers: {

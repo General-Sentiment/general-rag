@@ -1,5 +1,5 @@
 {
-  "name": "journal-print",
+  "name": "general-rag",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "postinstall": "node scripts/pdf-worker.mjs"
+    "postinstall": "node scripts/pdf-worker.mjs",
+    "tauri": "tauri",
+    "desktop:prepare": "node scripts/prepare-desktop.mjs",
+    "desktop:build": "tauri build --bundles app"
   },
   "dependencies": {
     "defuddle": "latest",
@@ -23,6 +26,7 @@
     "remark-gfm": "latest"
   },
   "devDependencies": {
+    "@tauri-apps/cli": "^2.12.4",
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
