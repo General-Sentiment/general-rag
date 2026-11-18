@@ -1,12 +1,4 @@
 @font-face {
-  font-family: "ABC Areal";
-  src: url("/fonts/ABCArealVariable.woff2") format("woff2");
-  font-style: normal;
-  font-weight: 400 700;
-  font-display: swap;
-}
-
-@font-face {
   font-family: "ABC Areal Superfamily";
   src: url("/fonts/ABCArealSuperfamilyVariable.ttf") format("truetype");
   font-style: normal;
@@ -28,7 +20,7 @@
   --line-height: 16px;
   --space: 16px;
   color-scheme: light;
-  font-family: "ABC Areal", Arial, Helvetica, sans-serif;
+  font-family: var(--font-areal), Arial, Helvetica, sans-serif;
   font-kerning: none;
   font-variant-ligatures: none;
   -webkit-font-smoothing: antialiased;

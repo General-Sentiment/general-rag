@@ -1,5 +1,12 @@
 import type { Metadata } from "next";
+import localFont from "next/font/local";
 import "./globals.css";
+
+const areal = localFont({
+  src: "../public/fonts/ABCArealVariable.woff2",
+  display: "swap",
+  variable: "--font-areal",
+});
 
 export const metadata: Metadata = {
   title: "Quarter",
@@ -8,7 +15,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={areal.variable}>
       <body>{children}</body>
     </html>
   );
