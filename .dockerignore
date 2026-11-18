@@ -1,0 +1,17 @@
+.git
+.github
+.next
+.venv
+.desktop-build
+node_modules
+output
+tmp
+__pycache__
+*.pyc
+*.tsbuildinfo
+src-tauri/resources
+src-tauri/target
+src-tauri/gen
+*.pdf
+*.md
+!README.md

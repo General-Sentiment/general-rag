@@ -19,6 +19,19 @@ Supported controls: Letter, A4, and Half Letter; Areal sans and Alegreya serif; 
 
 The server needs a Node environment with Python installed (not an Edge runtime or static hosting). It uses `.venv/bin/python` by default; set `JOURNAL_PYTHON` to select another interpreter. Include `markdown_columns.py`, `assets/fonts/`, `public/fonts/`, and `vendor/pyphen/` in deployments, and install the Python requirements. `npm install` copies the matching PDF.js worker into `public/pdfjs/`.
 
+## Cloudflare deployment
+
+The hosted app runs as a Next.js standalone server with its Python renderer inside a Cloudflare Container. `wrangler.jsonc` routes the public Worker to one scale-to-zero container, and `Dockerfile` produces the same `linux/amd64` image locally and in Cloudflare Workers Builds.
+
+Cloudflare Containers require the Workers Paid plan. After enabling it, connect this GitHub repository to a Worker named `general-rag`, use `main` as the production branch, leave the optional build command empty, and use `npx wrangler deploy` as the deploy command. Workers Builds will then rebuild and deploy the app after every push to `main`. Preview builds are intentionally disabled because Container images are updated by `wrangler deploy`, not `wrangler versions upload`.
+
+To validate the image locally:
+
+```sh
+docker build --platform linux/amd64 --tag general-rag:cloudflare .
+docker run --rm --publish 3000:3000 general-rag:cloudflare
+```
+
 ## Native macOS app
 
 The Tauri build bundles the Next.js server, an Apple silicon Node runtime, and a standalone PDF renderer. The installed app does not require Node, Python, or this source checkout.

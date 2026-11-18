@@ -1,0 +1,36 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "general-rag",
+  "main": "cloudflare/index.ts",
+  "compatibility_date": "2026-11-18",
+  "upload_source_maps": true,
+  "workers_dev": true,
+  "observability": {
+    "enabled": true
+  },
+  "containers": [
+    {
+      "class_name": "GeneralRagContainer",
+      "scheduling_policy": "durable_object",
+      "images": {
+        "base": {
+          "dockerfile": "./Dockerfile"
+        }
+      }
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "GENERAL_RAG_CONTAINER",
+        "class_name": "GeneralRagContainer"
+      }
+    ]
+  },
+  "exports": {
+    "GeneralRagContainer": {
+      "type": "durable-object",
+      "storage": "sqlite"
+    }
+  }
+}

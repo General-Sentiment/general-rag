@@ -8,6 +8,8 @@
     "start": "next start",
     "lint": "eslint .",
     "postinstall": "node scripts/pdf-worker.mjs",
+    "cloudflare:deploy": "wrangler deploy",
+    "cloudflare:dev": "wrangler dev",
     "tauri": "tauri",
     "desktop:prepare": "node scripts/prepare-desktop.mjs",
     "desktop:build": "tauri build --bundles app"
@@ -32,6 +34,7 @@
     "@types/react-dom": "latest",
     "eslint": "latest",
     "eslint-config-next": "latest",
-    "typescript": "latest"
+    "typescript": "latest",
+    "wrangler": "latest"
   }
 }
