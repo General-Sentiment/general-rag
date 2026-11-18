@@ -35,6 +35,10 @@
     ]
   },
   "exports": {
+    "GeneralRagContainer": {
+      "type": "durable-object",
+      "state": "deleted"
+    },
     "QuarterContainer": {
       "type": "durable-object",
       "storage": "sqlite"
