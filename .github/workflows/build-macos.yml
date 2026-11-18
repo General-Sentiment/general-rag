@@ -67,13 +67,14 @@ jobs:
           if gh release view main-latest >/dev/null 2>&1; then
             gh release upload main-latest release/Quarter-macOS.dmg --clobber
             gh release edit main-latest \
-              --title "Latest main build" \
-              --notes "Automatically built from main at ${GITHUB_SHA}." \
+              --title "Latest Quarter build" \
+              --notes "Automatically built from Quarter's main branch at ${GITHUB_SHA}." \
+              --target "$GITHUB_SHA" \
               --prerelease
           else
             gh release create main-latest release/Quarter-macOS.dmg \
-              --title "Latest main build" \
-              --notes "Automatically built from main at ${GITHUB_SHA}." \
+              --title "Latest Quarter build" \
+              --notes "Automatically built from Quarter's main branch at ${GITHUB_SHA}." \
               --prerelease \
               --target "$GITHUB_SHA"
           fi
